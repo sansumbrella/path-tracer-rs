@@ -1,10 +1,20 @@
 extern crate image;
 
 use image::ImageBuffer;
+mod math;
+type Vec3 = math::Vec3;
 
 fn main() -> std::io::Result<()> {
     let nx = 200;
     let ny = 100;
+
+    let rgb = Vec3::new(0.0, 0.5, 1.0);
+    println!(
+        "Have a vector with rgb values: {}, {}, {}",
+        rgb.r(),
+        rgb.g(),
+        rgb.b()
+    );
 
     let buffer = ImageBuffer::from_fn(nx, ny, |x, y| {
         let r = x as f32 / nx as f32;
