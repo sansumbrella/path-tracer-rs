@@ -33,10 +33,10 @@ impl std::ops::Mul for Vec3 {
     ///
     /// # Examples
     /// ```rust
-    /// let a = Vec3(0.0, 1.0, 2.0);
-    /// let b = Vec3(10.0, 10.0, 10.0);
-    /// let c = Vec3(12, 23, 45, 67);
-    /// assert_eq!(a * b, Vec3(0, 10.0, 20.0))
+    /// use math::Vec3;
+    /// let a = Vec3::new(0.0, 1.0, 2.0);
+    /// let b = Vec3::new(10.0, 10.0, 10.0);
+    /// assert_eq!(a * b, Vec3::new(0.0, 10.0, 20.0))
     /// ```
     fn mul(self, rhs: Self) -> Self {
         Vec3::new(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)

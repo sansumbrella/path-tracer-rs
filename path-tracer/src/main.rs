@@ -1,14 +1,13 @@
 extern crate image;
 
 use image::ImageBuffer;
-mod math;
-type Vec3 = math::Vec3;
+use math::Vec3;
 
 fn main() -> std::io::Result<()> {
     let nx = 200;
     let ny = 100;
 
-    let rgb = Vec3::new(0.0, 0.5, 1.0) * Vec3::new(1.0, 2.0, 2.0);
+    let rgb = Vec3(0.0, 0.5, 1.0) * Vec3(1.0, 2.0, 2.0);
     println!(
         "Have a vector with rgb values: {}, {}, {}",
         rgb.r(),

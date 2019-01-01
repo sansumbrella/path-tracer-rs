@@ -1,8 +1,6 @@
-[package]
-name = "path-tracer"
-version = "0.1.0"
-authors = ["David Wicks <wicks.db@gmail.com>"]
-edition = "2018"
+[workspace]
 
-[dependencies]
-image = "*"
+members = [
+    "path-tracer",
+    "math",
+]

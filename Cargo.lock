@@ -135,6 +135,10 @@ version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "math"
+version = "0.1.0"
+
+[[package]]
 name = "memoffset"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -199,6 +203,7 @@ name = "path-tracer"
 version = "0.1.0"
 dependencies = [
  "image 0.20.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "math 0.1.0",
 ]
 
 [[package]]
