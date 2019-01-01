@@ -43,12 +43,60 @@ impl std::ops::Mul for Vec3 {
     }
 }
 
+impl std::ops::MulAssign for Vec3 {
+    fn mul_assign(&mut self, rhs: Self) {
+        self.0 *= rhs.0;
+        self.1 *= rhs.1;
+        self.2 *= rhs.2;
+    }
+}
+
+impl std::ops::Div for Vec3 {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self {
+        Vec3::new(self.0 / rhs.0, self.1 / rhs.1, self.2 / rhs.2)
+    }
+}
+
+impl std::ops::DivAssign for Vec3 {
+    fn div_assign(&mut self, rhs: Self) {
+        self.0 /= rhs.0;
+        self.1 /= rhs.1;
+        self.2 /= rhs.2;
+    }
+}
+
 impl std::ops::Add for Vec3 {
     type Output = Self;
 
     // Component-wise addition of two vectors.
     fn add(self, rhs: Self) -> Self {
         Vec3::new(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2)
+    }
+}
+
+impl std::ops::AddAssign for Vec3 {
+    fn add_assign(&mut self, rhs: Self) {
+        self.0 += rhs.0;
+        self.1 += rhs.1;
+        self.2 += rhs.2;
+    }
+}
+
+impl std::ops::Sub for Vec3 {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self {
+        Vec3::new(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
+    }
+}
+
+impl std::ops::SubAssign for Vec3 {
+    fn sub_assign(&mut self, rhs: Self) {
+        self.0 -= rhs.0;
+        self.1 -= rhs.1;
+        self.2 -= rhs.2;
     }
 }
 
