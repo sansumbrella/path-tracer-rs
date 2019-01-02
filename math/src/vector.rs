@@ -1,7 +1,12 @@
 /// Simple vector implementation in 3 dimensions
 /// Using the newtype idiom since arrays can be structs directly
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy)]
 pub struct Vec3(pub [f32; 3]);
+
+pub fn normalize(vector: &Vec3) -> Vec3 {
+    let &[x, y, z] = &vector.0;
+    Vec3::new(x, y, z) / vector.length()
+}
 
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
@@ -25,6 +30,21 @@ impl Vec3 {
     }
     pub fn z(&self) -> f32 {
         self.0[2]
+    }
+
+    pub fn length_squared(&self) -> f32 {
+        let &[x, y, z] = &self.0;
+        x * x + y * y + z * z
+    }
+
+    pub fn length(&self) -> f32 {
+        self.length_squared().sqrt()
+    }
+}
+
+impl Clone for Vec3 {
+    fn clone(&self) -> Self {
+        *self
     }
 }
 
@@ -84,6 +104,14 @@ impl std::ops::Div for Vec3 {
     }
 }
 
+impl std::ops::Div<f32> for Vec3 {
+    type Output = Self;
+
+    fn div(self, rhs: f32) -> Self {
+        Vec3::new(self.0[0] / rhs, self.0[1] / rhs, self.0[2] / rhs)
+    }
+}
+
 impl std::ops::DivAssign for Vec3 {
     fn div_assign(&mut self, rhs: Self) {
         self.0[0] /= rhs.0[0];
@@ -129,6 +157,18 @@ impl std::ops::Sub for Vec3 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
+        Vec3::new(
+            self.0[0] - rhs.0[0],
+            self.0[1] - rhs.0[1],
+            self.0[2] - rhs.0[2],
+        )
+    }
+}
+
+impl std::ops::Sub for &Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: Self) -> Vec3 {
         Vec3::new(
             self.0[0] - rhs.0[0],
             self.0[1] - rhs.0[1],
