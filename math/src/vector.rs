@@ -28,7 +28,7 @@ impl Vec3 {
     }
 }
 
-impl std::ops::Mul for Vec3 {
+impl std::ops::Mul<Vec3> for Vec3 {
     type Output = Self;
 
     /// Component-wise multiplication of two vectors.
@@ -46,6 +46,21 @@ impl std::ops::Mul for Vec3 {
             self.0[1] * rhs.0[1],
             self.0[2] * rhs.0[2],
         )
+    }
+}
+
+impl std::ops::Mul<f32> for Vec3 {
+    type Output = Self;
+
+    fn mul(self, rhs: f32) -> Self {
+        Vec3::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
+    }
+}
+
+impl std::ops::Mul<f32> for &Vec3 {
+    type Output = Vec3;
+    fn mul(self, rhs: f32) -> Vec3 {
+        Vec3::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
     }
 }
 
@@ -82,6 +97,18 @@ impl std::ops::Add for Vec3 {
 
     // Component-wise addition of two vectors.
     fn add(self, rhs: Self) -> Self {
+        Vec3::new(
+            self.0[0] + rhs.0[0],
+            self.0[1] + rhs.0[1],
+            self.0[2] + rhs.0[2],
+        )
+    }
+}
+
+impl std::ops::Add<Vec3> for &Vec3 {
+    type Output = Vec3;
+
+    fn add(self, rhs: Vec3) -> Vec3 {
         Vec3::new(
             self.0[0] + rhs.0[0],
             self.0[1] + rhs.0[1],
