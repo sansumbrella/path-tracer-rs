@@ -8,6 +8,20 @@ pub fn normalize(vector: &Vec3) -> Vec3 {
     Vec3::new(x, y, z) / vector.length()
 }
 
+pub fn dot(a: &Vec3, b: &Vec3) -> f32 {
+    let &[ax, ay, az] = &a.0;
+    let &[bx, by, bz] = &b.0;
+
+    ax * bx + ay * by + az * bz
+}
+
+pub fn cross(a: &Vec3, b: &Vec3) -> Vec3 {
+    let &[ax, ay, az] = &a.0;
+    let &[bx, by, bz] = &b.0;
+
+    Vec3::new(ay * bz - az * by, -(ax * bz - az * bx), ax * by - ay * bx)
+}
+
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3([x, y, z])
