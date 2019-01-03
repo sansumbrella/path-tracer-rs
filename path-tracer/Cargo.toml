@@ -6,5 +6,6 @@ edition = "2018"
 
 [dependencies]
 image = "*"
+rand = "^0.6.1"
 math = { path = "../math" }
 geometry = { path = "../geometry" }

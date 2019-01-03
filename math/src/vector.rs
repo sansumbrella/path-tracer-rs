@@ -66,7 +66,7 @@ impl Clone for Vec3 {
     }
 }
 
-impl std::ops::Mul<Vec3> for Vec3 {
+impl Mul<Vec3> for Vec3 {
     type Output = Self;
 
     /// Component-wise multiplication of two vectors.
@@ -87,7 +87,7 @@ impl std::ops::Mul<Vec3> for Vec3 {
     }
 }
 
-impl std::ops::Mul<f32> for Vec3 {
+impl Mul<f32> for Vec3 {
     type Output = Self;
 
     fn mul(self, rhs: f32) -> Self {
@@ -95,14 +95,14 @@ impl std::ops::Mul<f32> for Vec3 {
     }
 }
 
-impl std::ops::Mul<f32> for &Vec3 {
+impl Mul<f32> for &Vec3 {
     type Output = Vec3;
     fn mul(self, rhs: f32) -> Vec3 {
         Vec3::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
     }
 }
 
-impl std::ops::MulAssign for Vec3 {
+impl MulAssign for Vec3 {
     fn mul_assign(&mut self, rhs: Self) {
         self.0[0] *= rhs.0[0];
         self.0[1] *= rhs.0[1];
@@ -110,7 +110,7 @@ impl std::ops::MulAssign for Vec3 {
     }
 }
 
-impl std::ops::Div for Vec3 {
+impl Div for Vec3 {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self {
@@ -122,7 +122,7 @@ impl std::ops::Div for Vec3 {
     }
 }
 
-impl std::ops::Div<f32> for Vec3 {
+impl Div<f32> for Vec3 {
     type Output = Self;
 
     fn div(self, rhs: f32) -> Self {
@@ -130,11 +130,19 @@ impl std::ops::Div<f32> for Vec3 {
     }
 }
 
-impl std::ops::DivAssign for Vec3 {
+impl DivAssign for Vec3 {
     fn div_assign(&mut self, rhs: Self) {
         self.0[0] /= rhs.0[0];
         self.0[1] /= rhs.0[1];
         self.0[2] /= rhs.0[2];
+    }
+}
+
+impl DivAssign<f32> for Vec3 {
+    fn div_assign(&mut self, rhs: f32) {
+        self.0[0] /= rhs;
+        self.0[1] /= rhs;
+        self.0[2] /= rhs;
     }
 }
 
@@ -172,7 +180,7 @@ impl Add<Vec3> for &Vec3 {
     }
 }
 
-impl std::ops::AddAssign for Vec3 {
+impl AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
         self.0[0] += rhs.0[0];
         self.0[1] += rhs.0[1];
@@ -180,7 +188,7 @@ impl std::ops::AddAssign for Vec3 {
     }
 }
 
-impl std::ops::Sub for Vec3 {
+impl Sub for Vec3 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
@@ -192,7 +200,7 @@ impl std::ops::Sub for Vec3 {
     }
 }
 
-impl std::ops::Sub for &Vec3 {
+impl Sub for &Vec3 {
     type Output = Vec3;
 
     fn sub(self, rhs: Self) -> Vec3 {
@@ -204,7 +212,7 @@ impl std::ops::Sub for &Vec3 {
     }
 }
 
-impl std::ops::SubAssign for Vec3 {
+impl SubAssign for Vec3 {
     fn sub_assign(&mut self, rhs: Self) {
         self.0[0] -= rhs.0[0];
         self.0[1] -= rhs.0[1];

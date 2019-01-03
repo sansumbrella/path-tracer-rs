@@ -4,16 +4,20 @@ use geometry::{HitRecord, Hitable, Sphere};
 use image::ImageBuffer;
 use math::Ray;
 use math::Vec3;
-use math::{cross, dot, mix, normalize};
+use math::{mix, normalize};
+use rand::prelude::*;
 
 fn main() -> std::io::Result<()> {
     let nx = 200;
     let ny = 100;
+    let ns = 100;
 
-    let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
+    let camera = Camera {
+        lower_left_corner: Vec3::new(-2.0, -1.0, -1.0),
+        horizontal: Vec3::new(4.0, 0.0, 0.0),
+        vertical: Vec3::new(0.0, 2.0, 0.0),
+        origin: Vec3::new(0.0, 0.0, 0.0),
+    };
 
     let mut world = World(vec![]);
     world.collection().push(Box::new(Sphere {
@@ -31,15 +35,17 @@ fn main() -> std::io::Result<()> {
         radius: 100.0,
     }));
 
-    let buffer = ImageBuffer::from_fn(nx, ny, |x, y| {
-        let u = x as f32 / nx as f32;
-        let v = (ny - y) as f32 / ny as f32;
+    let mut rng = rand::thread_rng();
 
-        let ray = Ray::new(
-            origin,
-            lower_left_corner + (horizontal * u) + (vertical * v),
-        );
-        let rgb = color(&world, ray);
+    let buffer = ImageBuffer::from_fn(nx, ny, |x, y| {
+        let mut rgb = Vec3::new(0.0, 0.0, 0.0);
+        for _ in 0..ns {
+            let u = (x as f32 + rng.gen::<f32>()) / nx as f32;
+            let v = ((ny - y) as f32 + rng.gen::<f32>()) / ny as f32;
+            let ray = camera.make_ray(u, v);
+            rgb += color(&world, ray);
+        }
+        rgb /= ns as f32;
         let ir: u8 = (255.99 * rgb.r()) as u8;
         let ig: u8 = (255.99 * rgb.g()) as u8;
         let ib: u8 = (255.99 * rgb.b()) as u8;
@@ -81,5 +87,21 @@ impl Hitable for World {
 impl World {
     pub fn collection(&mut self) -> &mut Vec<Box<Hitable>> {
         &mut self.0
+    }
+}
+
+struct Camera {
+    origin: Vec3,
+    lower_left_corner: Vec3,
+    horizontal: Vec3,
+    vertical: Vec3,
+}
+
+impl Camera {
+    pub fn make_ray(&self, u: f32, v: f32) -> Ray {
+        Ray::new(
+            self.origin,
+            self.lower_left_corner + self.horizontal * u + self.vertical * v - self.origin,
+        )
     }
 }
