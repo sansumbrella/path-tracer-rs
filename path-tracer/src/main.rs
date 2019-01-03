@@ -8,9 +8,9 @@ use math::{mix, normalize};
 use rand::prelude::*;
 
 fn main() -> std::io::Result<()> {
-    let nx = 200;
-    let ny = 100;
-    let ns = 100;
+    let nx = 400;
+    let ny = 200;
+    let ns = 50;
 
     let camera = Camera {
         lower_left_corner: Vec3::new(-2.0, -1.0, -1.0),
