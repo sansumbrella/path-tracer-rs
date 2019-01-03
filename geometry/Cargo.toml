@@ -1,10 +1,8 @@
 [package]
-name = "path-tracer"
+name = "geometry"
 version = "0.1.0"
 authors = ["David Wicks <wicks.db@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-image = "*"
 math = { path = "../math" }
-geometry = { path = "../geometry" }

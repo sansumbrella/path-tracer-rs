@@ -1,8 +1,12 @@
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+
 /// Simple vector implementation in 3 dimensions
 /// Using the newtype idiom since arrays can be structs directly
 #[derive(Debug, PartialEq, Copy)]
 pub struct Vec3(pub [f32; 3]);
 
+/// Returns a unit vector with the same direction as the input vector.
+/// TODO: make generic so at least Vec3 and &Vec3 parameters are accepted
 pub fn normalize(vector: &Vec3) -> Vec3 {
     let &[x, y, z] = &vector.0;
     Vec3::new(x, y, z) / vector.length()
@@ -134,7 +138,7 @@ impl std::ops::DivAssign for Vec3 {
     }
 }
 
-impl std::ops::Add for Vec3 {
+impl Add for Vec3 {
     type Output = Self;
 
     // Component-wise addition of two vectors.
@@ -147,7 +151,16 @@ impl std::ops::Add for Vec3 {
     }
 }
 
-impl std::ops::Add<Vec3> for &Vec3 {
+impl Add<f32> for Vec3 {
+    type Output = Self;
+
+    fn add(self, rhs: f32) -> Self {
+        let &[x, y, z] = &self.0;
+        Vec3::new(x + rhs, y + rhs, z + rhs)
+    }
+}
+
+impl Add<Vec3> for &Vec3 {
     type Output = Vec3;
 
     fn add(self, rhs: Vec3) -> Vec3 {

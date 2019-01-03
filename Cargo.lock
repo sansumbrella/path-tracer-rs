@@ -77,6 +77,13 @@ version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "geometry"
+version = "0.1.0"
+dependencies = [
+ "math 0.1.0",
+]
+
+[[package]]
 name = "gif"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -202,6 +209,7 @@ dependencies = [
 name = "path-tracer"
 version = "0.1.0"
 dependencies = [
+ "geometry 0.1.0",
  "image 0.20.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "math 0.1.0",
 ]
