@@ -26,6 +26,11 @@ fn main() -> std::io::Result<()> {
         radius: 0.3,
     }));
 
+    world.collection().push(Box::new(Sphere {
+        center: Vec3::new(0.0, -100.5, -1.0),
+        radius: 100.0,
+    }));
+
     let buffer = ImageBuffer::from_fn(nx, ny, |x, y| {
         let u = x as f32 / nx as f32;
         let v = (ny - y) as f32 / ny as f32;
