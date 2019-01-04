@@ -1,5 +1,6 @@
 mod ray;
 mod vector;
+use rand::distributions::{Distribution, UnitSphereSurface};
 
 pub use self::ray::*;
 pub use self::vector::*;
@@ -10,4 +11,10 @@ pub use self::vector::*;
 /// manually writing out the variants.
 pub fn mix(a: Vec3, b: Vec3, t: f64) -> Vec3 {
     a + (b - a) * t
+}
+
+pub fn random_in_unit_sphere() -> Vec3 {
+    let mut rng = rand::thread_rng();
+    let sphere = UnitSphereSurface::new();
+    Vec3(sphere.sample(&mut rng))
 }

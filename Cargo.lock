@@ -103,7 +103,6 @@ name = "geometry"
 version = "0.1.0"
 dependencies = [
  "math 0.1.0",
- "rand 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -167,6 +166,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "math"
 version = "0.1.0"
+dependencies = [
+ "rand 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "memoffset"
