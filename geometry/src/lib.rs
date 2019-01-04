@@ -1,6 +1,5 @@
 use math::{dot, normalize, reflect, Ray, Vec3};
 use rand::distributions::{Distribution, UnitSphereSurface};
-use std::rc::Rc;
 
 fn random_in_unit_sphere() -> Vec3 {
     let mut rng = rand::thread_rng();
@@ -8,11 +7,11 @@ fn random_in_unit_sphere() -> Vec3 {
     Vec3(sphere.sample(&mut rng))
 }
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
-    pub material: Rc<Scattering>,
+    pub material: &'a Scattering,
 }
 
 pub trait Hitable {
@@ -22,7 +21,7 @@ pub trait Hitable {
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub material: Rc<Scattering>,
+    pub material: Box<Scattering>,
 }
 
 impl Hitable for Sphere {
@@ -40,7 +39,7 @@ impl Hitable for Sphere {
                     t,
                     p,
                     normal: (&p - &self.center) / self.radius,
-                    material: Rc::clone(&self.material),
+                    material: &*self.material,
                 });
             }
         }

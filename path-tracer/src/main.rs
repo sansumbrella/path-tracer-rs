@@ -6,7 +6,6 @@ use math::Ray;
 use math::Vec3;
 use math::{mix, normalize};
 use rand::prelude::*;
-use std::rc::Rc;
 
 fn main() -> std::io::Result<()> {
     let nx = 300;
@@ -24,7 +23,7 @@ fn main() -> std::io::Result<()> {
     world.collection().push(Box::new(Sphere {
         center: Vec3::new(0.2, 0.0, -1.0),
         radius: 0.6,
-        material: Rc::new(Lambertian {
+        material: Box::new(Lambertian {
             albedo: Vec3::new(0.5, 0.5, 0.5),
         }),
     }));
@@ -32,7 +31,7 @@ fn main() -> std::io::Result<()> {
     world.collection().push(Box::new(Sphere {
         center: Vec3::new(-0.3, 0.1, -0.8),
         radius: 0.3,
-        material: Rc::new(Metallic {
+        material: Box::new(Metallic {
             albedo: Vec3::new(0.5, 0.5, 0.5),
         }),
     }));
@@ -40,7 +39,7 @@ fn main() -> std::io::Result<()> {
     world.collection().push(Box::new(Sphere {
         center: Vec3::new(0.0, -100.5, -1.0),
         radius: 100.0,
-        material: Rc::new(Lambertian {
+        material: Box::new(Lambertian {
             albedo: Vec3::new(0.9, 0.9, 0.1),
         }),
     }));
