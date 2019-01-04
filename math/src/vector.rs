@@ -12,6 +12,10 @@ pub fn normalize(vector: &Vec3) -> Vec3 {
     Vec3::new(x, y, z) / vector.length()
 }
 
+pub fn reflect(vector: &Vec3, normal: &Vec3) -> Vec3 {
+    vector - &(normal * 2.0 * dot(vector, normal))
+}
+
 pub fn dot(a: &Vec3, b: &Vec3) -> f64 {
     let &[ax, ay, az] = &a.0;
     let &[bx, by, bz] = &b.0;

@@ -1,9 +1,18 @@
-use math::{dot, Ray, Vec3};
+use math::{dot, normalize, reflect, Ray, Vec3};
+use rand::distributions::{Distribution, UnitSphereSurface};
+use std::rc::Rc;
+
+fn random_in_unit_sphere() -> Vec3 {
+    let mut rng = rand::thread_rng();
+    let sphere = UnitSphereSurface::new();
+    Vec3(sphere.sample(&mut rng))
+}
 
 pub struct HitRecord {
     pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
+    pub material: Rc<Scattering>,
 }
 
 pub trait Hitable {
@@ -13,6 +22,7 @@ pub trait Hitable {
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
+    pub material: Rc<Scattering>,
 }
 
 impl Hitable for Sphere {
@@ -30,9 +40,54 @@ impl Hitable for Sphere {
                     t,
                     p,
                     normal: (&p - &self.center) / self.radius,
+                    material: Rc::clone(&self.material),
                 });
             }
         }
+        None
+    }
+}
+
+pub struct ScatteredRay {
+    pub ray: Ray,
+    pub attenuation: Vec3,
+}
+
+pub trait Scattering {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<ScatteredRay>;
+}
+
+pub struct Lambertian {
+    pub albedo: Vec3,
+}
+
+impl Scattering for Lambertian {
+    fn scatter(&self, _: &Ray, hit: &HitRecord) -> Option<ScatteredRay> {
+        let target = hit.p + hit.normal + random_in_unit_sphere();
+        let ray = Ray::new(hit.p, target - hit.p);
+        Some(ScatteredRay {
+            ray,
+            attenuation: self.albedo,
+        })
+    }
+}
+
+pub struct Metallic {
+    pub albedo: Vec3,
+}
+
+impl Scattering for Metallic {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<ScatteredRay> {
+        let reflected = reflect(&normalize(ray.direction()), &hit.normal);
+        let scattered = Ray::new(hit.p, reflected);
+
+        if dot(scattered.direction(), &hit.normal) > 0.0 {
+            return Some(ScatteredRay {
+                attenuation: self.albedo,
+                ray: scattered,
+            });
+        }
+
         None
     }
 }

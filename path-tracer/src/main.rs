@@ -1,12 +1,12 @@
 extern crate image;
 
-use geometry::{HitRecord, Hitable, Sphere};
+use geometry::{HitRecord, Hitable, Lambertian, Metallic, Sphere};
 use image::ImageBuffer;
 use math::Ray;
 use math::Vec3;
 use math::{mix, normalize};
-use rand::distributions::{Distribution, UnitSphereSurface};
 use rand::prelude::*;
+use std::rc::Rc;
 
 fn main() -> std::io::Result<()> {
     let nx = 300;
@@ -24,16 +24,25 @@ fn main() -> std::io::Result<()> {
     world.collection().push(Box::new(Sphere {
         center: Vec3::new(0.2, 0.0, -1.0),
         radius: 0.6,
+        material: Rc::new(Lambertian {
+            albedo: Vec3::new(0.5, 0.5, 0.5),
+        }),
     }));
 
     world.collection().push(Box::new(Sphere {
         center: Vec3::new(-0.3, 0.1, -0.8),
         radius: 0.3,
+        material: Rc::new(Metallic {
+            albedo: Vec3::new(0.5, 0.5, 0.5),
+        }),
     }));
 
     world.collection().push(Box::new(Sphere {
         center: Vec3::new(0.0, -100.5, -1.0),
         radius: 100.0,
+        material: Rc::new(Metallic {
+            albedo: Vec3::new(0.9, 0.9, 0.1),
+        }),
     }));
 
     let mut rng = rand::thread_rng();
@@ -44,7 +53,7 @@ fn main() -> std::io::Result<()> {
             let u = (x as f64 + rng.gen::<f64>()) / nx as f64;
             let v = ((ny - y) as f64 + rng.gen::<f64>()) / ny as f64;
             let ray = camera.make_ray(u, v);
-            rgb += color(&world, ray);
+            rgb += color(&world, ray, 0);
         }
         rgb /= ns as f64;
         let rgb = Vec3::new(rgb.r().sqrt(), rgb.g().sqrt(), rgb.b().sqrt());
@@ -60,17 +69,16 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn random_in_unit_sphere() -> Vec3 {
-    let mut rng = rand::thread_rng();
-    let sphere = UnitSphereSurface::new();
-    Vec3(sphere.sample(&mut rng))
-}
-
-fn color(world: &World, ray: Ray) -> Vec3 {
+fn color(world: &World, ray: Ray, depth: u8) -> Vec3 {
     if let Some(hit) = world.hit(&ray, 0.001, 1.0) {
-        let target = hit.p + hit.normal + random_in_unit_sphere();
         // recurse until you bounce off into the sky
-        return color(world, Ray::new(hit.p, target - hit.p)) * 0.5;
+        if depth < 50 {
+            if let Some(reflection) = hit.material.scatter(&ray, &hit) {
+                return color(world, reflection.ray, depth + 1) * reflection.attenuation;
+            } else {
+                return Vec3::new(0.0, 0.0, 0.0);
+            }
+        }
         // return (hit.normal + 1.0) * 0.5;
     }
 
