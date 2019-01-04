@@ -1,22 +1,22 @@
 use math::{dot, Ray, Vec3};
 
 pub struct HitRecord {
-    pub t: f32,
+    pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
 }
 
 pub trait Hitable {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
 pub struct Sphere {
     pub center: Vec3,
-    pub radius: f32,
+    pub radius: f64,
 }
 
 impl Hitable for Sphere {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin() - &self.center;
         let a = dot(&ray.direction(), &ray.direction());
         let b = dot(&oc, &ray.direction());

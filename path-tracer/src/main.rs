@@ -5,12 +5,13 @@ use image::ImageBuffer;
 use math::Ray;
 use math::Vec3;
 use math::{mix, normalize};
+use rand::distributions::{Distribution, UnitSphereSurface};
 use rand::prelude::*;
 
 fn main() -> std::io::Result<()> {
-    let nx = 400;
-    let ny = 200;
-    let ns = 50;
+    let nx = 300;
+    let ny = 150;
+    let ns = 100;
 
     let camera = Camera {
         lower_left_corner: Vec3::new(-2.0, -1.0, -1.0),
@@ -40,12 +41,13 @@ fn main() -> std::io::Result<()> {
     let buffer = ImageBuffer::from_fn(nx, ny, |x, y| {
         let mut rgb = Vec3::new(0.0, 0.0, 0.0);
         for _ in 0..ns {
-            let u = (x as f32 + rng.gen::<f32>()) / nx as f32;
-            let v = ((ny - y) as f32 + rng.gen::<f32>()) / ny as f32;
+            let u = (x as f64 + rng.gen::<f64>()) / nx as f64;
+            let v = ((ny - y) as f64 + rng.gen::<f64>()) / ny as f64;
             let ray = camera.make_ray(u, v);
             rgb += color(&world, ray);
         }
-        rgb /= ns as f32;
+        rgb /= ns as f64;
+        let rgb = Vec3::new(rgb.r().sqrt(), rgb.g().sqrt(), rgb.b().sqrt());
         let ir: u8 = (255.99 * rgb.r()) as u8;
         let ig: u8 = (255.99 * rgb.g()) as u8;
         let ib: u8 = (255.99 * rgb.b()) as u8;
@@ -58,9 +60,18 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
+fn random_in_unit_sphere() -> Vec3 {
+    let mut rng = rand::thread_rng();
+    let sphere = UnitSphereSurface::new();
+    Vec3(sphere.sample(&mut rng))
+}
+
 fn color(world: &World, ray: Ray) -> Vec3 {
-    if let Some(hit) = world.hit(&ray, 0.0, 1.0) {
-        return (hit.normal + 1.0) * 0.5;
+    if let Some(hit) = world.hit(&ray, 0.001, 1.0) {
+        let target = hit.p + hit.normal + random_in_unit_sphere();
+        // recurse until you bounce off into the sky
+        return color(world, Ray::new(hit.p, target - hit.p)) * 0.5;
+        // return (hit.normal + 1.0) * 0.5;
     }
 
     let unit_direction = normalize(ray.direction());
@@ -71,7 +82,7 @@ fn color(world: &World, ray: Ray) -> Vec3 {
 struct World(Vec<Box<Hitable>>);
 
 impl Hitable for World {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut closest = t_max;
         let mut found: Option<HitRecord> = None;
         for hitable in &self.0 {
@@ -98,7 +109,7 @@ struct Camera {
 }
 
 impl Camera {
-    pub fn make_ray(&self, u: f32, v: f32) -> Ray {
+    pub fn make_ray(&self, u: f64, v: f64) -> Ray {
         Ray::new(
             self.origin,
             self.lower_left_corner + self.horizontal * u + self.vertical * v - self.origin,

@@ -3,7 +3,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 /// Simple vector implementation in 3 dimensions
 /// Using the newtype idiom since arrays can be structs directly
 #[derive(Debug, PartialEq, Copy)]
-pub struct Vec3(pub [f32; 3]);
+pub struct Vec3(pub [f64; 3]);
 
 /// Returns a unit vector with the same direction as the input vector.
 /// TODO: make generic so at least Vec3 and &Vec3 parameters are accepted
@@ -12,7 +12,7 @@ pub fn normalize(vector: &Vec3) -> Vec3 {
     Vec3::new(x, y, z) / vector.length()
 }
 
-pub fn dot(a: &Vec3, b: &Vec3) -> f32 {
+pub fn dot(a: &Vec3, b: &Vec3) -> f64 {
     let &[ax, ay, az] = &a.0;
     let &[bx, by, bz] = &b.0;
 
@@ -27,35 +27,35 @@ pub fn cross(a: &Vec3, b: &Vec3) -> Vec3 {
 }
 
 impl Vec3 {
-    pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
+    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3([x, y, z])
     }
 
-    pub fn r(&self) -> f32 {
+    pub fn r(&self) -> f64 {
         self.0[0]
     }
-    pub fn g(&self) -> f32 {
+    pub fn g(&self) -> f64 {
         self.0[1]
     }
-    pub fn b(&self) -> f32 {
+    pub fn b(&self) -> f64 {
         self.0[2]
     }
-    pub fn x(&self) -> f32 {
+    pub fn x(&self) -> f64 {
         self.0[0]
     }
-    pub fn y(&self) -> f32 {
+    pub fn y(&self) -> f64 {
         self.0[1]
     }
-    pub fn z(&self) -> f32 {
+    pub fn z(&self) -> f64 {
         self.0[2]
     }
 
-    pub fn length_squared(&self) -> f32 {
+    pub fn length_squared(&self) -> f64 {
         let &[x, y, z] = &self.0;
         x * x + y * y + z * z
     }
 
-    pub fn length(&self) -> f32 {
+    pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
 }
@@ -87,17 +87,17 @@ impl Mul<Vec3> for Vec3 {
     }
 }
 
-impl Mul<f32> for Vec3 {
+impl Mul<f64> for Vec3 {
     type Output = Self;
 
-    fn mul(self, rhs: f32) -> Self {
+    fn mul(self, rhs: f64) -> Self {
         Vec3::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
     }
 }
 
-impl Mul<f32> for &Vec3 {
+impl Mul<f64> for &Vec3 {
     type Output = Vec3;
-    fn mul(self, rhs: f32) -> Vec3 {
+    fn mul(self, rhs: f64) -> Vec3 {
         Vec3::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
     }
 }
@@ -122,10 +122,10 @@ impl Div for Vec3 {
     }
 }
 
-impl Div<f32> for Vec3 {
+impl Div<f64> for Vec3 {
     type Output = Self;
 
-    fn div(self, rhs: f32) -> Self {
+    fn div(self, rhs: f64) -> Self {
         Vec3::new(self.0[0] / rhs, self.0[1] / rhs, self.0[2] / rhs)
     }
 }
@@ -138,8 +138,8 @@ impl DivAssign for Vec3 {
     }
 }
 
-impl DivAssign<f32> for Vec3 {
-    fn div_assign(&mut self, rhs: f32) {
+impl DivAssign<f64> for Vec3 {
+    fn div_assign(&mut self, rhs: f64) {
         self.0[0] /= rhs;
         self.0[1] /= rhs;
         self.0[2] /= rhs;
@@ -159,10 +159,10 @@ impl Add for Vec3 {
     }
 }
 
-impl Add<f32> for Vec3 {
+impl Add<f64> for Vec3 {
     type Output = Self;
 
-    fn add(self, rhs: f32) -> Self {
+    fn add(self, rhs: f64) -> Self {
         let &[x, y, z] = &self.0;
         Vec3::new(x + rhs, y + rhs, z + rhs)
     }
