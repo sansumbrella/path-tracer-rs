@@ -40,7 +40,7 @@ fn main() -> std::io::Result<()> {
     world.collection().push(Box::new(Sphere {
         center: Vec3::new(0.0, -100.5, -1.0),
         radius: 100.0,
-        material: Rc::new(Metallic {
+        material: Rc::new(Lambertian {
             albedo: Vec3::new(0.9, 0.9, 0.1),
         }),
     }));
