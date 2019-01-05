@@ -41,7 +41,18 @@ impl Hitable for Sphere {
         let c = dot(&oc, &oc) - self.radius * self.radius;
         let discriminant = b * b - a * c;
         if discriminant > 0.0 {
-            let t = (-b - (b * b - a * c).sqrt()) / a;
+            let t = (-b - f64::sqrt(discriminant)) / a;
+            if t < t_max && t > t_min {
+                let p = ray.point_at_parameter(t);
+                return Some(HitRecord {
+                    t,
+                    p,
+                    normal: (&p - &self.center) / self.radius,
+                    material: &*self.material,
+                });
+            }
+
+            let t = (-b + f64::sqrt(discriminant)) / a;
             if t < t_max && t > t_min {
                 let p = ray.point_at_parameter(t);
                 return Some(HitRecord {
