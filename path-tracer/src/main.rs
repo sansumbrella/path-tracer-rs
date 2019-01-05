@@ -1,6 +1,6 @@
 extern crate image;
 
-use geometry::{HitRecord, Hitable, Lambertian, Metallic, Sphere};
+use geometry::{Dielectric, HitRecord, Hitable, Lambertian, Metallic, Sphere};
 use image::ImageBuffer;
 use math::Ray;
 use math::Vec3;
@@ -21,18 +21,27 @@ fn main() -> std::io::Result<()> {
 
     let mut world = World(vec![]);
     world.collection().push(Box::new(Sphere {
-        center: Vec3::new(0.2, 0.0, -1.0),
-        radius: 0.6,
+        center: Vec3::new(0.0, 0.0, -1.0),
+        radius: 0.5,
         material: Box::new(Lambertian {
-            albedo: Vec3::new(0.5, 0.5, 0.5),
+            albedo: Vec3::new(0.1, 0.2, 0.5),
         }),
     }));
 
     world.collection().push(Box::new(Sphere {
-        center: Vec3::new(-0.3, 0.1, -0.8),
-        radius: 0.3,
+        center: Vec3::new(-1.0, 0.0, -1.0),
+        radius: 0.5,
+        material: Box::new(Dielectric {
+            refractive_index: 1.5,
+        }),
+    }));
+
+    world.collection().push(Box::new(Sphere {
+        center: Vec3::new(1.0, 0.0, -1.0),
+        radius: 0.5,
         material: Box::new(Metallic {
-            albedo: Vec3::new(0.5, 0.5, 0.5),
+            albedo: Vec3::new(0.8, 0.6, 0.2),
+            roughness: 0.0,
         }),
     }));
 
@@ -40,7 +49,7 @@ fn main() -> std::io::Result<()> {
         center: Vec3::new(0.0, -100.5, -1.0),
         radius: 100.0,
         material: Box::new(Lambertian {
-            albedo: Vec3::new(0.9, 0.9, 0.1),
+            albedo: Vec3::new(0.8, 0.8, 0.0),
         }),
     }));
 

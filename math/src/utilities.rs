@@ -1,4 +1,4 @@
-use super::Vec3;
+use super::vector::*;
 use rand::distributions::{Distribution, UnitSphereSurface};
 use std::ops::{Add, Mul, Sub};
 
@@ -15,6 +15,25 @@ pub fn random_in_unit_sphere() -> Vec3 {
     let mut rng = rand::thread_rng();
     let sphere = UnitSphereSurface::new();
     Vec3(sphere.sample(&mut rng))
+}
+
+/// Reflect a vector about a normal.
+pub fn reflect(vector: &Vec3, normal: &Vec3) -> Vec3 {
+    vector - &(normal * 2.0 * dot(vector, normal))
+}
+
+/// Returns a refracted vector according to Fresnel's law.
+pub fn refract(vector: &Vec3, normal: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
+    let vector = normalize(vector);
+    let dt = dot(&vector, normal);
+    let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
+
+    if discriminant > 0.0 {
+        let refracted = (vector - normal * dt) * ni_over_nt - normal * f64::sqrt(discriminant);
+        return Some(refracted);
+    }
+
+    None
 }
 
 #[cfg(test)]
