@@ -21,7 +21,7 @@ fn main() -> std::io::Result<()> {
 
     let mut world = World(vec![]);
     world.collection().push(Box::new(Sphere {
-        center: Vec3::new(0.0, 0.0, -1.0),
+        center: Vec3::new(0.0, 0.0, -0.9),
         radius: 0.5,
         material: Box::new(Lambertian {
             albedo: Vec3::new(0.1, 0.2, 0.5),
@@ -29,7 +29,7 @@ fn main() -> std::io::Result<()> {
     }));
 
     world.collection().push(Box::new(Sphere {
-        center: Vec3::new(-1.0, 0.0, -1.0),
+        center: Vec3::new(-1.0, -0.0, -0.9),
         radius: 0.5,
         material: Box::new(Dielectric {
             refractive_index: 1.5,
@@ -37,7 +37,7 @@ fn main() -> std::io::Result<()> {
     }));
 
     world.collection().push(Box::new(Sphere {
-        center: Vec3::new(1.0, 0.0, -1.0),
+        center: Vec3::new(1.0, 0.0, -0.9),
         radius: 0.5,
         material: Box::new(Metallic {
             albedo: Vec3::new(0.8, 0.6, 0.2),
@@ -79,15 +79,16 @@ fn main() -> std::io::Result<()> {
 
 fn color(world: &World, ray: Ray, depth: u8) -> Vec3 {
     if let Some(hit) = world.hit(&ray, 0.001, 1.0) {
+        // return (hit.normal + 1.0) * 0.5;
         // recurse until you bounce off into the sky
         if depth < 50 {
             if let Some(reflection) = hit.material.scatter(&ray, &hit) {
+                // return (*reflection.ray.direction() + 1.0) * 0.5;
                 return color(world, reflection.ray, depth + 1) * reflection.attenuation;
             } else {
                 return Vec3::new(0.0, 0.0, 0.0);
             }
         }
-        // return (hit.normal + 1.0) * 0.5;
     }
 
     let unit_direction = normalize(ray.direction());
