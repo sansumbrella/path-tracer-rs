@@ -12,12 +12,7 @@ fn main() -> std::io::Result<()> {
     let ny = 150;
     let ns = 100;
 
-    let camera = Camera {
-        lower_left_corner: Vec3::new(-2.0, -1.0, -1.0),
-        horizontal: Vec3::new(4.0, 0.0, 0.0),
-        vertical: Vec3::new(0.0, 2.0, 0.0),
-        origin: Vec3::new(0.0, 0.0, 0.0),
-    };
+    let camera = Camera::with_fov_and_aspect(90.0, nx as f64 / ny as f64);
 
     let mut world = World(vec![]);
     world.collection().push(Box::new(Sphere {
@@ -126,6 +121,21 @@ struct Camera {
 }
 
 impl Camera {
+    /// Construct a camera with a given vertical field of view in degrees
+    /// and an aspect ratio (w:h)
+    pub fn with_fov_and_aspect(fov: f64, aspect: f64) -> Camera {
+        let theta = fov * std::f64::consts::PI / 180.0;
+        let half_height = f64::tan(theta / 2.0);
+        let half_width = aspect * half_height;
+
+        Camera {
+            lower_left_corner: Vec3::new(-half_width, -half_height, -1.0),
+            horizontal: Vec3::new(2.0 * half_width, 0.0, 0.0),
+            vertical: Vec3::new(0.0, 2.0 * half_height, 0.0),
+            origin: Vec3::new(0.0, 0.0, 0.0),
+        }
+    }
+
     pub fn make_ray(&self, u: f64, v: f64) -> Ray {
         Ray::new(
             self.origin,
