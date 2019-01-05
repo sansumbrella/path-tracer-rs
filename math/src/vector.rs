@@ -12,10 +12,12 @@ pub fn normalize(vector: &Vec3) -> Vec3 {
     Vec3::new(x, y, z) / vector.length()
 }
 
+/// Reflect a vector about a normal.
 pub fn reflect(vector: &Vec3, normal: &Vec3) -> Vec3 {
     vector - &(normal * 2.0 * dot(vector, normal))
 }
 
+/// Calculates the dot product of two vectors.
 pub fn dot(a: &Vec3, b: &Vec3) -> f64 {
     let &[ax, ay, az] = &a.0;
     let &[bx, by, bz] = &b.0;
@@ -23,6 +25,7 @@ pub fn dot(a: &Vec3, b: &Vec3) -> f64 {
     ax * bx + ay * by + az * bz
 }
 
+/// Calculates the cross product of two vectors.
 pub fn cross(a: &Vec3, b: &Vec3) -> Vec3 {
     let &[ax, ay, az] = &a.0;
     let &[bx, by, bz] = &b.0;
@@ -54,11 +57,14 @@ impl Vec3 {
         self.0[2]
     }
 
+    /// Returns the magnitude squared of the vector.
+    /// Use to avoid the square root calculation needed for magnitude.
     pub fn length_squared(&self) -> f64 {
         let &[x, y, z] = &self.0;
         x * x + y * y + z * z
     }
 
+    /// Returns the magnitude of the vector (Euclidian norm)
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
@@ -241,6 +247,59 @@ mod tests {
     fn add_two_vectors() {
         let a = Vec3::new(-1.0, 1.0, 2.0);
         let b = Vec3::new(10.0, 10.0, 10.0);
-        assert_eq!(a + b, Vec3::new(9.0, 11.0, 12.0));
+        assert_eq!(
+            a + b,
+            Vec3::new(9.0, 11.0, 12.0),
+            "Vectors can be added together"
+        );
+    }
+
+    #[test]
+    fn dot_product() {
+        let a = Vec3::new(1.0, 0.0, 0.0);
+        let b = Vec3::new(0.5, 0.5, 0.5);
+
+        assert_eq!(
+            dot(&a, &b),
+            0.5,
+            "Dot product returns a scalar measuring similarity of two vectors"
+        );
+
+        assert_eq!(
+            dot(&Vec3::new(0.0, -1.0, 0.0), &Vec3::new(0.0, 1.0, 0.0)),
+            -1.0,
+            "Dot product returns a scalar measuring similarity of two vectors"
+        );
+    }
+
+    #[test]
+    fn cross_product() {
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let y = Vec3::new(0.0, 1.0, 0.0);
+        let z = Vec3::new(0.0, 0.0, 1.0);
+
+        assert_eq!(
+            cross(&x, &y),
+            z,
+            "Cross product returns a vector orthogonal to both inputs"
+        );
+
+        assert_eq!(
+            cross(&y, &x),
+            Vec3::new(0.0, 0.0, -1.0),
+            "Cross product is not commutative"
+        );
+
+        assert_eq!(
+            cross(&y, &z),
+            x,
+            "Cross product returns a vector orthogonal to both inputs"
+        );
+
+        assert_eq!(
+            cross(&z, &x),
+            y,
+            "Cross product returns a vector orthogonal to both inputs"
+        );
     }
 }

@@ -3,7 +3,7 @@ use math::{dot, Ray, Vec3};
 
 ///
 /// HitRecords store information about a ray intersection with a Hitable surface or volume.
-/// 
+///
 pub struct HitRecord<'a> {
     pub t: f64,
     pub p: Vec3,
@@ -26,8 +26,6 @@ pub struct Sphere {
 impl Hitable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin() - &self.center;
-        // would like to try out domain distortions here
-        // let oc = oc + Vec3::new((oc.x() * 3.0).sin(), (oc.y() * 2.0).sin(), (oc.z() * 5.0).sin());
         let a = dot(&ray.direction(), &ray.direction());
         let b = dot(&oc, &ray.direction());
         let c = dot(&oc, &oc) - self.radius * self.radius;
