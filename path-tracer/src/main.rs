@@ -1,10 +1,8 @@
 extern crate image;
 
-use geometry::{Dielectric, HitRecord, Hitable, Lambertian, Metallic, Sphere};
+use geometry::{Camera, Dielectric, Hitable, Lambertian, Metallic, Sphere, World};
 use image::ImageBuffer;
-use math::Ray;
-use math::Vec3;
-use math::{mix, normalize};
+use math::{mix, normalize, Ray, Vec3};
 use rand::prelude::*;
 
 fn main() -> std::io::Result<()> {
@@ -12,27 +10,36 @@ fn main() -> std::io::Result<()> {
     let ny = 150;
     let ns = 100;
 
-    let camera = Camera::with_fov_and_aspect(90.0, nx as f64 / ny as f64);
+    let camera = Camera::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        nx as f64 / ny as f64,
+    );
 
-    let mut world = World(vec![]);
-    world.collection().push(Box::new(Sphere {
-        center: Vec3::new(0.0, 0.0, -1.0),
+    println!("Camera settings: {:?}", camera);
+
+    let mut world = World::new();
+    let sphere_z = -1.0;
+    world.push(Box::new(Sphere {
+        center: Vec3::new(0.0, 0.0, sphere_z),
         radius: 0.5,
         material: Box::new(Lambertian {
             albedo: Vec3::new(0.1, 0.2, 0.5),
         }),
     }));
 
-    world.collection().push(Box::new(Sphere {
-        center: Vec3::new(-1.0, -0.0, -1.0),
+    world.push(Box::new(Sphere {
+        center: Vec3::new(-1.0, -0.0, sphere_z),
         radius: 0.5,
         material: Box::new(Dielectric {
             refractive_index: 1.5,
         }),
     }));
 
-    world.collection().push(Box::new(Sphere {
-        center: Vec3::new(1.0, 0.0, -1.0),
+    world.push(Box::new(Sphere {
+        center: Vec3::new(1.0, 0.0, sphere_z),
         radius: 0.5,
         material: Box::new(Metallic {
             albedo: Vec3::new(0.8, 0.6, 0.2),
@@ -40,8 +47,8 @@ fn main() -> std::io::Result<()> {
         }),
     }));
 
-    world.collection().push(Box::new(Sphere {
-        center: Vec3::new(0.0, -100.5, -1.0),
+    world.push(Box::new(Sphere {
+        center: Vec3::new(0.0, -100.5, sphere_z),
         radius: 100.0,
         material: Box::new(Lambertian {
             albedo: Vec3::new(0.8, 0.8, 0.0),
@@ -89,57 +96,4 @@ fn color(world: &World, ray: Ray, depth: u8) -> Vec3 {
     let unit_direction = normalize(ray.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);
     mix(Vec3::new(1.0, 1.0, 1.0), Vec3::new(0.5, 0.7, 1.0), t)
-}
-
-struct World(Vec<Box<Hitable>>);
-
-impl Hitable for World {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        let mut closest = t_max;
-        let mut found: Option<HitRecord> = None;
-        for hitable in &self.0 {
-            if let Some(hit) = hitable.hit(ray, t_min, closest) {
-                closest = hit.t;
-                found = Some(hit);
-            }
-        }
-        found
-    }
-}
-
-impl World {
-    pub fn collection(&mut self) -> &mut Vec<Box<Hitable>> {
-        &mut self.0
-    }
-}
-
-struct Camera {
-    origin: Vec3,
-    lower_left_corner: Vec3,
-    horizontal: Vec3,
-    vertical: Vec3,
-}
-
-impl Camera {
-    /// Construct a camera with a given vertical field of view in degrees
-    /// and an aspect ratio (w:h)
-    pub fn with_fov_and_aspect(fov: f64, aspect: f64) -> Camera {
-        let theta = fov * std::f64::consts::PI / 180.0;
-        let half_height = f64::tan(theta / 2.0);
-        let half_width = aspect * half_height;
-
-        Camera {
-            lower_left_corner: Vec3::new(-half_width, -half_height, -1.0),
-            horizontal: Vec3::new(2.0 * half_width, 0.0, 0.0),
-            vertical: Vec3::new(0.0, 2.0 * half_height, 0.0),
-            origin: Vec3::new(0.0, 0.0, 0.0),
-        }
-    }
-
-    pub fn make_ray(&self, u: f64, v: f64) -> Ray {
-        Ray::new(
-            self.origin,
-            self.lower_left_corner + self.horizontal * u + self.vertical * v - self.origin,
-        )
-    }
 }
