@@ -1,5 +1,5 @@
 use super::HitRecord;
-use math::{dot, normalize, random_in_unit_sphere, reflect, refract, Ray, Vec3};
+use math::{dot, normalize, rand, random_in_unit_sphere, reflect, refract, schlick, Ray, Vec3};
 
 /// A Ray after scattering off a Hitable
 pub struct ScatteredRay {
@@ -56,6 +56,47 @@ pub struct Dielectric {
 }
 
 impl Scattering for Dielectric {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<ScatteredRay> {
+        let attenuation = Vec3::new(1.0, 1.0, 1.0);
+        let outward_normal;
+        let ni_over_nt;
+        let cosine;
+
+        if dot(ray.direction(), hit.normal()) > 0.0 {
+            outward_normal = &Vec3::new(0.0, 0.0, 0.0) - hit.normal();
+            ni_over_nt = self.refractive_index;
+            let c = dot(ray.direction(), hit.normal()) / ray.direction().length();
+            cosine = f64::sqrt(1.0 - self.refractive_index * self.refractive_index * (1.0 - c * c));
+        } else {
+            outward_normal = *hit.normal();
+            ni_over_nt = 1.0 / self.refractive_index;
+            cosine = -dot(ray.direction(), hit.normal()) / ray.direction().length();
+        }
+
+        if let Some(refracted) = refract(ray.direction(), &outward_normal, ni_over_nt) {
+            let reflect_prob = schlick(cosine, self.refractive_index);
+            if rand() > reflect_prob {
+                // refract
+                return Some(ScatteredRay {
+                    ray: Ray::new(*hit.position(), refracted),
+                    attenuation,
+                });
+            }
+        }
+
+        let reflected = reflect(ray.direction(), hit.normal());
+        Some(ScatteredRay {
+            ray: Ray::new(*hit.position(), reflected),
+            attenuation,
+        })
+    }
+}
+
+pub struct NaiveDielectric {
+    pub refractive_index: f64,
+}
+
+impl Scattering for NaiveDielectric {
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<ScatteredRay> {
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
 

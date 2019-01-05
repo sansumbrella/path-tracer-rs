@@ -21,7 +21,7 @@ fn main() -> std::io::Result<()> {
 
     let mut world = World(vec![]);
     world.collection().push(Box::new(Sphere {
-        center: Vec3::new(0.0, 0.0, -0.9),
+        center: Vec3::new(0.0, 0.0, -1.0),
         radius: 0.5,
         material: Box::new(Lambertian {
             albedo: Vec3::new(0.1, 0.2, 0.5),
@@ -29,7 +29,7 @@ fn main() -> std::io::Result<()> {
     }));
 
     world.collection().push(Box::new(Sphere {
-        center: Vec3::new(-1.0, -0.0, -0.9),
+        center: Vec3::new(-1.0, -0.0, -1.0),
         radius: 0.5,
         material: Box::new(Dielectric {
             refractive_index: 1.5,
@@ -37,7 +37,7 @@ fn main() -> std::io::Result<()> {
     }));
 
     world.collection().push(Box::new(Sphere {
-        center: Vec3::new(1.0, 0.0, -0.9),
+        center: Vec3::new(1.0, 0.0, -1.0),
         radius: 0.5,
         material: Box::new(Metallic {
             albedo: Vec3::new(0.8, 0.6, 0.2),

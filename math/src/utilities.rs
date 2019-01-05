@@ -1,5 +1,6 @@
 use super::vector::*;
 use rand::distributions::{Distribution, UnitSphereSurface};
+use rand::prelude::*;
 use std::ops::{Add, Mul, Sub};
 
 /// mix performs a linear interpolation between two like values
@@ -17,6 +18,11 @@ pub fn random_in_unit_sphere() -> Vec3 {
     Vec3(sphere.sample(&mut rng))
 }
 
+pub fn rand() -> f64 {
+    let mut rng = rand::thread_rng();
+    rng.gen::<f64>()
+}
+
 /// Reflect a vector about a normal.
 pub fn reflect(vector: &Vec3, normal: &Vec3) -> Vec3 {
     vector - &(normal * 2.0 * dot(vector, normal))
@@ -30,10 +36,18 @@ pub fn refract(vector: &Vec3, normal: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
 
     if discriminant > 0.0 {
         let refracted = (vector - normal * dt) * ni_over_nt - normal * f64::sqrt(discriminant);
+        // let refracted = vector * ni_over_nt + normal * (ni_over_nt * dt - discriminant.sqrt());
         return Some(refracted);
     }
 
     None
+}
+
+/// Schlick polynomial approximation for reflection probability.
+pub fn schlick(cosine: f64, refractive_index: f64) -> f64 {
+    let r0 = (1.0 - refractive_index) / (1.0 + refractive_index);
+    let r0 = r0 * r0;
+    r0 + (1.0 - r0) * f64::powi(1.0 - cosine, 5)
 }
 
 #[cfg(test)]
