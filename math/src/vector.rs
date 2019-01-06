@@ -1,13 +1,16 @@
+use std::borrow::Borrow;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
-
 /// Simple vector implementation in 3 dimensions
 /// Using the newtype idiom since arrays can be structs directly
 #[derive(Debug, PartialEq, Copy)]
 pub struct Vec3(pub [f64; 3]);
 
 /// Returns a unit vector with the same direction as the input vector.
-/// TODO: make generic so at least Vec3 and &Vec3 parameters are accepted
-pub fn normalize(vector: &Vec3) -> Vec3 {
+pub fn normalize<T>(vector: T) -> Vec3
+where
+    T: Borrow<Vec3>,
+{
+    let vector = vector.borrow();
     let &[x, y, z] = &vector.0;
     Vec3::new(x, y, z) / vector.length()
 }
@@ -296,5 +299,14 @@ mod tests {
             y,
             "Cross product returns a vector orthogonal to both inputs"
         );
+    }
+
+    #[test]
+    fn normalize_vectors() {
+        let a = Vec3::new(1.0, 2.0, 3.0);
+        let b = Vec3::new(1.0, 1.0, 0.0);
+
+        normalize(b);
+        normalize(&b);
     }
 }
