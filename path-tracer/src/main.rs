@@ -6,14 +6,14 @@ use math::{mix, normalize, Ray, Vec3};
 use rand::prelude::*;
 
 fn main() -> std::io::Result<()> {
-    let nx = 300;
-    let ny = 150;
-    let ns = 200;
+    let nx = 900;
+    let ny = 600;
+    let ns = 100;
 
-    let look_from = Vec3::new(-3.0, 2.25, 0.5);
-    let look_at = Vec3::new(0.0, 0.0, -1.0);
+    let look_from = Vec3::new(13.0, 2.0, 3.0);
+    let look_at = Vec3::new(0.0, 0.0, 0.0);
+    let dist_to_focus = 10.0;
     let aperture = 0.1;
-    let dist_to_focus = (look_from - look_at).length();
 
     let camera = Camera::new(
         look_from,
@@ -27,41 +27,7 @@ fn main() -> std::io::Result<()> {
 
     println!("Camera settings: {:?}", camera);
 
-    let mut world = World::new();
-    let sphere_z = -1.0;
-    world.push(Box::new(Sphere {
-        center: Vec3::new(0.0, 0.0, sphere_z),
-        radius: 0.5,
-        material: Box::new(Lambertian {
-            albedo: Vec3::new(0.1, 0.2, 0.5),
-        }),
-    }));
-
-    world.push(Box::new(Sphere {
-        center: Vec3::new(-1.0, -0.0, sphere_z),
-        radius: 0.5,
-        material: Box::new(Dielectric {
-            refractive_index: 1.5,
-        }),
-    }));
-
-    world.push(Box::new(Sphere {
-        center: Vec3::new(1.0, 0.0, sphere_z),
-        radius: 0.5,
-        material: Box::new(Metallic {
-            albedo: Vec3::new(0.8, 0.6, 0.2),
-            roughness: 0.0,
-        }),
-    }));
-
-    world.push(Box::new(Sphere {
-        center: Vec3::new(0.0, -100.5, sphere_z),
-        radius: 100.0,
-        material: Box::new(Lambertian {
-            albedo: Vec3::new(0.8, 0.8, 0.0),
-        }),
-    }));
-
+    let world = build_book_scene();
     let mut rng = rand::thread_rng();
 
     let buffer = ImageBuffer::from_fn(nx, ny, |x, y| {
@@ -103,4 +69,87 @@ fn color(world: &World, ray: Ray, depth: u8) -> Vec3 {
     let unit_direction = normalize(ray.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);
     mix(Vec3::new(1.0, 1.0, 1.0), Vec3::new(0.5, 0.7, 1.0), t)
+}
+
+fn build_book_scene() -> World {
+    let mut world = World::new();
+    let mut rng = rand::thread_rng();
+    let mut rand = || rng.gen::<f64>();
+
+    world.push(Box::new(Sphere {
+        center: Vec3::new(0.0, -1000.0, 0.0),
+        radius: 1000.0,
+        material: Box::new(Lambertian {
+            albedo: Vec3::fill(0.5),
+        }),
+    }));
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let a = a as f64;
+            let b = b as f64;
+            let material_choice: f64 = rand();
+            let center = Vec3::new(a + 0.9 * rand(), 0.2, b + 0.9 * rand());
+
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if material_choice < 0.8 {
+                    world.push(Box::new(Sphere {
+                        center,
+                        radius: 0.2,
+                        material: Box::new(Lambertian {
+                            albedo: Vec3::new(rand() * rand(), rand() * rand(), rand() * rand()),
+                        }),
+                    }))
+                } else if material_choice < 0.95 {
+                    world.push(Box::new(Sphere {
+                        center,
+                        radius: 0.2,
+                        material: Box::new(Metallic {
+                            albedo: Vec3::new(
+                                0.5 * rand() * rand(),
+                                0.5 * rand() * rand(),
+                                0.5 * rand() * rand(),
+                            ),
+                            roughness: 0.5 * rand(),
+                        }),
+                    }));
+                } else {
+                    world.push(Box::new(Sphere {
+                        center,
+                        radius: 0.2,
+                        material: Box::new(Dielectric {
+                            refractive_index: 1.5,
+                        }),
+                    }));
+                }
+            }
+        }
+    }
+
+    world.push(Box::new(Sphere {
+        center: Vec3::new(0.0, 1.0, 0.0),
+        radius: 1.0,
+        material: Box::new(Dielectric {
+            refractive_index: 1.5,
+        }),
+    }));
+
+    world.push(Box::new(Sphere {
+        center: Vec3::new(-4.0, 1.0, 0.0),
+        radius: 1.0,
+        material: Box::new(Lambertian {
+            albedo: Vec3::new(0.4, 0.2, 0.1),
+        }),
+    }));
+
+    world.push(Box::new(Sphere {
+        center: Vec3::new(4.0, 1.0, 0.0),
+        radius: 1.0,
+        material: Box::new(Metallic {
+            albedo: Vec3::new(0.7, 0.6, 0.5),
+            roughness: 0.0,
+        }),
+    }));
+
+    world
 }
