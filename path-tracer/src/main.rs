@@ -6,9 +6,9 @@ use math::{mix, normalize, Ray, Vec3};
 use rand::prelude::*;
 
 fn main() -> std::io::Result<()> {
-    let nx = 900;
-    let ny = 600;
-    let ns = 100;
+    let nx = 1200;
+    let ny = 800;
+    let ns = 10;
 
     let look_from = Vec3::new(13.0, 2.0, 3.0);
     let look_at = Vec3::new(0.0, 0.0, 0.0);
