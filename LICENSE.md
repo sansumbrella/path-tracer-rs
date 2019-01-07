@@ -1,3 +1,5 @@
+Copyright 2019 David Wicks
+
 ## License
 
 Licensed under either of
