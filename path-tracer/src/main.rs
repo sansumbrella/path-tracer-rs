@@ -21,7 +21,7 @@ fn main() -> std::io::Result<()> {
     println!("Camera settings: {:?}", camera);
 
     let mut world = World::new();
-    let sphere_z = -1.0;
+    let sphere_z = -1.5;
     world.push(Box::new(Sphere {
         center: Vec3::new(0.0, 0.0, sphere_z),
         radius: 0.5,
@@ -80,7 +80,7 @@ fn main() -> std::io::Result<()> {
 }
 
 fn color(world: &World, ray: Ray, depth: u8) -> Vec3 {
-    if let Some(hit) = world.hit(&ray, 0.001, 1.0) {
+    if let Some(hit) = world.hit(&ray, 0.001, std::f64::MAX) {
         // return (hit.normal + 1.0) * 0.5;
         // recurse until you bounce off into the sky
         if depth < 50 {
