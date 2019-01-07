@@ -11,17 +11,17 @@ fn main() -> std::io::Result<()> {
     let ns = 100;
 
     let camera = Camera::new(
-        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(-2.0, 2.0, 1.0),
         Vec3::new(0.0, 0.0, -1.0),
         Vec3::new(0.0, 1.0, 0.0),
-        90.0,
+        30.0,
         nx as f64 / ny as f64,
     );
 
     println!("Camera settings: {:?}", camera);
 
     let mut world = World::new();
-    let sphere_z = -1.5;
+    let sphere_z = -1.0;
     world.push(Box::new(Sphere {
         center: Vec3::new(0.0, 0.0, sphere_z),
         radius: 0.5,
