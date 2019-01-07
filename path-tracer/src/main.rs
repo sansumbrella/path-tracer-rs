@@ -4,6 +4,8 @@ use geometry::{Camera, Dielectric, Hitable, Lambertian, Metallic, Sphere, World}
 use image::ImageBuffer;
 use math::{mix, normalize, Ray, Vec3};
 use rand::prelude::*;
+use rand::rngs::SmallRng;
+use rand::FromEntropy;
 
 fn main() -> std::io::Result<()> {
     let nx = 1200;
@@ -28,7 +30,7 @@ fn main() -> std::io::Result<()> {
     println!("Camera settings: {:?}", camera);
 
     let world = build_book_scene();
-    let mut rng = rand::thread_rng();
+    let mut rng = SmallRng::from_entropy();
 
     let buffer = ImageBuffer::from_fn(nx, ny, |x, y| {
         let mut rgb = Vec3::new(0.0, 0.0, 0.0);

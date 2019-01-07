@@ -12,22 +12,30 @@ where
     a + (b - a) * t
 }
 
+static mut RNG: Option<rand::rngs::SmallRng> = None;
+unsafe fn small_rng() -> &'static mut rand::rngs::SmallRng {
+    if RNG.is_none() {
+        RNG = Some(rand::rngs::SmallRng::from_entropy());
+    }
+    RNG.as_mut().unwrap()
+}
+
 /// returns a random point on the surface of a unit sphere
 pub fn random_in_unit_sphere() -> Vec3 {
-    let mut rng = rand::thread_rng();
+    let mut rng = unsafe { small_rng() };
     let sphere = UnitSphereSurface::new();
     Vec3(sphere.sample(&mut rng))
 }
 
 /// returns a random point within a unit disk
 pub fn random_in_unit_disk() -> [f64; 2] {
-    let mut rng = rand::thread_rng();
+    let mut rng = unsafe { small_rng() };
     let disk = UnitCircle::new();
     disk.sample(&mut rng)
 }
 
 pub fn rand() -> f64 {
-    let mut rng = rand::thread_rng();
+    let rng = unsafe { small_rng() };
     rng.gen::<f64>()
 }
 
