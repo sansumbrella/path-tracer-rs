@@ -63,7 +63,7 @@ impl Scattering for Dielectric {
         let cosine;
 
         if dot(ray.direction(), hit.normal()) > 0.0 {
-            outward_normal = &Vec3::new(0.0, 0.0, 0.0) - hit.normal();
+            outward_normal = -hit.normal();
             ni_over_nt = self.refractive_index;
             let c = dot(ray.direction(), hit.normal()) / ray.direction().length();
             cosine = f64::sqrt(1.0 - self.refractive_index * self.refractive_index * (1.0 - c * c));

@@ -1,41 +1,15 @@
 use std::borrow::Borrow;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+
 /// Simple vector implementation in 3 dimensions
 /// Using the newtype idiom since arrays can be structs directly
 #[derive(Debug, PartialEq, Copy)]
 pub struct Vec3(pub [f64; 3]);
 
-/// Returns a unit vector with the same direction as the input vector.
-pub fn normalize<T>(vector: T) -> Vec3
-where
-    T: Borrow<Vec3>,
-{
-    let vector = vector.borrow();
-    let &[x, y, z] = &vector.0;
-    Vec3::new(x, y, z) / vector.length()
-}
-
-/// Calculates the dot product of two vectors.
-pub fn dot(a: &Vec3, b: &Vec3) -> f64 {
-    let &[ax, ay, az] = &a.0;
-    let &[bx, by, bz] = &b.0;
-
-    ax * bx + ay * by + az * bz
-}
-
-/// Calculates the cross product of two vectors.
-pub fn cross(a: &Vec3, b: &Vec3) -> Vec3 {
-    let &[ax, ay, az] = &a.0;
-    let &[bx, by, bz] = &b.0;
-
-    Vec3::new(ay * bz - az * by, -(ax * bz - az * bx), ax * by - ay * bx)
-}
-
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3([x, y, z])
     }
-
     pub fn r(&self) -> f64 {
         self.0[0]
     }
@@ -64,7 +38,7 @@ impl Vec3 {
 
     /// Returns the magnitude of the vector (Euclidian norm)
     pub fn length(&self) -> f64 {
-        self.length_squared().sqrt()
+        f64::sqrt(self.length_squared())
     }
 }
 
@@ -74,59 +48,61 @@ impl Clone for Vec3 {
     }
 }
 
-impl Mul<Vec3> for Vec3 {
+impl<T> Add<T> for Vec3
+where
+    T: Borrow<Vec3>,
+{
     type Output = Self;
 
-    /// Component-wise multiplication of two vectors.
-    ///
-    /// # Examples
-    /// ```rust
-    /// use math::Vec3;
-    /// let a = Vec3::new(0.0, 1.0, 2.0);
-    /// let b = Vec3::new(10.0, 10.0, 10.0);
-    /// assert_eq!(a * b, Vec3::new(0.0, 10.0, 20.0))
-    /// ```
-    fn mul(self, rhs: Self) -> Self {
-        Vec3::new(
-            self.0[0] * rhs.0[0],
-            self.0[1] * rhs.0[1],
-            self.0[2] * rhs.0[2],
-        )
+    // Component-wise addition of two vectors.
+    fn add(self, rhs: T) -> Self {
+        let &[x, y, z] = &rhs.borrow().0;
+        Vec3::new(self.0[0] + x, self.0[1] + y, self.0[2] + z)
     }
 }
 
-impl Mul<f64> for Vec3 {
+impl Add<f64> for Vec3 {
     type Output = Self;
 
-    fn mul(self, rhs: f64) -> Self {
-        Vec3::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
+    fn add(self, rhs: f64) -> Self {
+        let &[x, y, z] = &self.0;
+        Vec3::new(x + rhs, y + rhs, z + rhs)
     }
 }
 
-impl Mul<f64> for &Vec3 {
+impl<T> Add<T> for &Vec3
+where
+    T: Borrow<Vec3>,
+{
     type Output = Vec3;
-    fn mul(self, rhs: f64) -> Vec3 {
-        Vec3::new(self.0[0] * rhs, self.0[1] * rhs, self.0[2] * rhs)
+
+    fn add(self, rhs: T) -> Vec3 {
+        let rhs = rhs.borrow();
+        Vec3::new(
+            self.0[0] + rhs.0[0],
+            self.0[1] + rhs.0[1],
+            self.0[2] + rhs.0[2],
+        )
     }
 }
 
-impl MulAssign for Vec3 {
-    fn mul_assign(&mut self, rhs: Self) {
-        self.0[0] *= rhs.0[0];
-        self.0[1] *= rhs.0[1];
-        self.0[2] *= rhs.0[2];
+impl AddAssign for Vec3 {
+    fn add_assign(&mut self, rhs: Self) {
+        self.0[0] += rhs.0[0];
+        self.0[1] += rhs.0[1];
+        self.0[2] += rhs.0[2];
     }
 }
 
-impl Div for Vec3 {
+impl<T> Div<T> for Vec3
+where
+    T: Borrow<Vec3>,
+{
     type Output = Self;
 
-    fn div(self, rhs: Self) -> Self {
-        Vec3::new(
-            self.0[0] / rhs.0[0],
-            self.0[1] / rhs.0[1],
-            self.0[2] / rhs.0[2],
-        )
+    fn div(self, rhs: T) -> Self {
+        let &[x, y, z] = &rhs.borrow().0;
+        Vec3::new(self.0[0] / x, self.0[1] / y, self.0[2] / z)
     }
 }
 
@@ -154,57 +130,69 @@ impl DivAssign<f64> for Vec3 {
     }
 }
 
-impl Add for Vec3 {
+impl<T> Mul<T> for Vec3
+where
+    T: Borrow<Vec3>,
+{
     type Output = Self;
-
-    // Component-wise addition of two vectors.
-    fn add(self, rhs: Self) -> Self {
-        Vec3::new(
-            self.0[0] + rhs.0[0],
-            self.0[1] + rhs.0[1],
-            self.0[2] + rhs.0[2],
-        )
+    fn mul(self, rhs: T) -> Self {
+        let &[x, y, z] = &rhs.borrow().0;
+        Vec3::new(self.0[0] * x, self.0[1] * y, self.0[2] * z)
     }
 }
 
-impl Add<f64> for Vec3 {
+impl Mul<f64> for Vec3 {
     type Output = Self;
 
-    fn add(self, rhs: f64) -> Self {
+    fn mul(self, rhs: f64) -> Self {
         let &[x, y, z] = &self.0;
-        Vec3::new(x + rhs, y + rhs, z + rhs)
+        Vec3::new(x * rhs, y * rhs, z * rhs)
     }
 }
 
-impl Add<Vec3> for &Vec3 {
+impl Mul<f64> for &Vec3 {
+    type Output = Vec3;
+    fn mul(self, rhs: f64) -> Vec3 {
+        let &[x, y, z] = &self.0;
+        Vec3::new(x * rhs, y * rhs, z * rhs)
+    }
+}
+
+impl MulAssign for Vec3 {
+    fn mul_assign(&mut self, rhs: Self) {
+        self.0[0] *= rhs.0[0];
+        self.0[1] *= rhs.0[1];
+        self.0[2] *= rhs.0[2];
+    }
+}
+
+impl Neg for Vec3 {
     type Output = Vec3;
 
-    fn add(self, rhs: Vec3) -> Vec3 {
-        Vec3::new(
-            self.0[0] + rhs.0[0],
-            self.0[1] + rhs.0[1],
-            self.0[2] + rhs.0[2],
-        )
+    fn neg(self) -> Vec3 {
+        let &[x, y, z] = &self.0;
+        Vec3::new(-x, -y, -z)
     }
 }
 
-impl AddAssign for Vec3 {
-    fn add_assign(&mut self, rhs: Self) {
-        self.0[0] += rhs.0[0];
-        self.0[1] += rhs.0[1];
-        self.0[2] += rhs.0[2];
+impl Neg for &Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Vec3 {
+        let &[x, y, z] = &self.0;
+        Vec3::new(-x, -y, -z)
     }
 }
 
-impl Sub for Vec3 {
+impl<T> Sub<T> for Vec3
+where
+    T: Borrow<Vec3>,
+{
     type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self {
-        Vec3::new(
-            self.0[0] - rhs.0[0],
-            self.0[1] - rhs.0[1],
-            self.0[2] - rhs.0[2],
-        )
+    fn sub(self, rhs: T) -> Self {
+        let &[x, y, z] = &rhs.borrow().0;
+        Vec3::new(self.0[0] - x, self.0[1] - y, self.0[2] - z)
     }
 }
 
@@ -235,14 +223,31 @@ mod tests {
     use super::*;
 
     #[test]
-    fn multiply_two_vectors() {
+    fn multiplication() {
         let a = Vec3::new(-1.0, 1.0, 2.0);
         let b = Vec3::new(10.0, 10.0, 10.0);
-        assert_eq!(a * b, Vec3::new(-10.0, 10.0, 20.0));
+        assert_eq!(
+            a * b,
+            Vec3::new(-10.0, 10.0, 20.0),
+            "Vector multiplication is component-wise"
+        );
+        assert_eq!(a * b, a * &b);
     }
 
     #[test]
-    fn add_two_vectors() {
+    fn division() {
+        let a = Vec3::new(1.0, 2.0, 4.0);
+        let b = Vec3::new(2.0, 2.0, 2.0);
+        assert_eq!(
+            a / b,
+            Vec3::new(0.5, 1.0, 2.0),
+            "Vector division is component-wise"
+        );
+        assert_eq!(a / b, a / &b);
+    }
+
+    #[test]
+    fn addition() {
         let a = Vec3::new(-1.0, 1.0, 2.0);
         let b = Vec3::new(10.0, 10.0, 10.0);
         assert_eq!(
@@ -250,63 +255,22 @@ mod tests {
             Vec3::new(9.0, 11.0, 12.0),
             "Vectors can be added together"
         );
+
+        assert_eq!(a + b, a + &b);
+        assert_eq!(a + b, b + a);
     }
 
     #[test]
-    fn dot_product() {
-        let a = Vec3::new(1.0, 0.0, 0.0);
-        let b = Vec3::new(0.5, 0.5, 0.5);
-
-        assert_eq!(
-            dot(&a, &b),
-            0.5,
-            "Dot product returns a scalar measuring similarity of two vectors"
-        );
-
-        assert_eq!(
-            dot(&Vec3::new(0.0, -1.0, 0.0), &Vec3::new(0.0, 1.0, 0.0)),
-            -1.0,
-            "Dot product returns a scalar measuring similarity of two vectors"
-        );
-    }
-
-    #[test]
-    fn cross_product() {
-        let x = Vec3::new(1.0, 0.0, 0.0);
-        let y = Vec3::new(0.0, 1.0, 0.0);
-        let z = Vec3::new(0.0, 0.0, 1.0);
-
-        assert_eq!(
-            cross(&x, &y),
-            z,
-            "Cross product returns a vector orthogonal to both inputs"
-        );
-
-        assert_eq!(
-            cross(&y, &x),
-            Vec3::new(0.0, 0.0, -1.0),
-            "Cross product is not commutative"
-        );
-
-        assert_eq!(
-            cross(&y, &z),
-            x,
-            "Cross product returns a vector orthogonal to both inputs"
-        );
-
-        assert_eq!(
-            cross(&z, &x),
-            y,
-            "Cross product returns a vector orthogonal to both inputs"
-        );
-    }
-
-    #[test]
-    fn normalize_vectors() {
+    fn subtraction() {
         let a = Vec3::new(1.0, 2.0, 3.0);
-        let b = Vec3::new(1.0, 1.0, 0.0);
+        let b = Vec3::new(4.0, 5.0, 6.0);
+        assert_eq!(a - b, Vec3::new(-3.0, -3.0, -3.0));
+        assert_eq!(b - a, Vec3::new(3.0, 3.0, 3.0));
+        assert_eq!(b - a, b - &a);
+        assert_eq!(a - b, a - &b);
+        assert_ne!(a - b, b - a);
 
-        normalize(b);
-        normalize(&b);
+        assert_eq!(-a, Vec3::new(-1.0, -2.0, -3.0));
+        assert_eq!(-b, Vec3::new(-4.0, -5.0, -6.0));
     }
 }
