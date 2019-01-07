@@ -8,14 +8,21 @@ use rand::prelude::*;
 fn main() -> std::io::Result<()> {
     let nx = 300;
     let ny = 150;
-    let ns = 100;
+    let ns = 200;
+
+    let look_from = Vec3::new(-3.0, 2.25, 0.5);
+    let look_at = Vec3::new(0.0, 0.0, -1.0);
+    let aperture = 0.1;
+    let dist_to_focus = (look_from - look_at).length();
 
     let camera = Camera::new(
-        Vec3::new(-2.0, 2.0, 1.0),
-        Vec3::new(0.0, 0.0, -1.0),
+        look_from,
+        look_at,
         Vec3::new(0.0, 1.0, 0.0),
-        30.0,
+        20.0,
         nx as f64 / ny as f64,
+        aperture,
+        dist_to_focus,
     );
 
     println!("Camera settings: {:?}", camera);
