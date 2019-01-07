@@ -45,16 +45,20 @@ impl Hitable for Sphere {
 #[cfg(test)]
 mod tests {
     use super::super::Lambertian;
-    use super::{Sphere, Vec3};
+    use super::{Hitable, Ray, Sphere, Vec3};
 
     #[test]
     fn sphere_at_origin() {
-        let _sphere = Sphere {
+        let sphere = Sphere {
             center: Vec3::fill(0.0),
             radius: 1.0,
             material: Box::new(Lambertian {
                 albedo: Vec3::fill(1.0),
             }),
         };
+
+        let ray = Ray::new(Vec3::new(0.0, 0.0, -2.0), Vec3::new(0.0, 0.0, 1.0));
+        let hit = sphere.hit(&ray, 0.0, std::f64::MAX).unwrap();
+        assert_eq!(hit.p, Vec3::new(0.0, 0.0, -1.0));
     }
 }
