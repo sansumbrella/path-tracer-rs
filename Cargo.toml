@@ -1,7 +1,5 @@
 [workspace]
 
 members = [
-    "path-tracer",
-    "math",
-    "geometry"
+    "path-tracer"
 ]

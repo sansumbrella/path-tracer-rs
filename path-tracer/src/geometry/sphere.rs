@@ -1,5 +1,5 @@
 use super::{HitRecord, Hitable, Scattering};
-use math::{dot, Ray, Vec3};
+use crate::math::{dot, Ray, Vec3};
 
 /// A Sphere at a given position
 pub struct Sphere {

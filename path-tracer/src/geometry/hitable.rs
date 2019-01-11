@@ -1,5 +1,5 @@
 use super::Scattering;
-use math::{Ray, Vec3};
+use crate::math::{Ray, Vec3};
 
 ///
 /// HitRecords store information about a ray intersection with a Hitable surface or volume.

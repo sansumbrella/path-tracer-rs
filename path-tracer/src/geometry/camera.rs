@@ -1,4 +1,4 @@
-use math::{cross, normalize, random_in_unit_disk, Ray, Vec3};
+use crate::math::{cross, normalize, random_in_unit_disk, Ray, Vec3};
 
 #[derive(Debug)]
 pub struct Camera {
