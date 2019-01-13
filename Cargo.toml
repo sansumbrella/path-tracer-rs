@@ -5,3 +5,6 @@ members = [
     "math",
     "geometry"
 ]
+
+[profile.release]
+lto = true
