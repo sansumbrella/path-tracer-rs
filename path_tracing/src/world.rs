@@ -1,7 +1,7 @@
 use super::hitable::*;
 use super::Ray;
 
-pub struct World(Vec<Box<Hitable>>);
+pub struct World(Vec<Box<Hitable + Sync>>);
 
 impl Hitable for World {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -22,11 +22,7 @@ impl World {
         World(vec![])
     }
 
-    pub fn collection(&mut self) -> &mut Vec<Box<Hitable>> {
-        &mut self.0
-    }
-
-    pub fn push(&mut self, item: Box<Hitable>) {
+    pub fn push(&mut self, item: Box<Hitable + Sync>) {
         self.0.push(item);
     }
 }

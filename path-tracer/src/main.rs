@@ -1,8 +1,7 @@
 extern crate image;
 
-use path_tracing::{mix, normalize, Ray, Vec3};
-use path_tracing::{Camera, Dielectric, Hitable, Lambertian, Metallic, Sphere, World};
-use image::ImageBuffer;
+use image::RgbImage;
+use path_tracing::{trace_scene, Camera, Dielectric, Lambertian, Metallic, Sphere, Vec3, World};
 use rand::prelude::*;
 
 fn main() -> std::io::Result<()> {
@@ -28,47 +27,21 @@ fn main() -> std::io::Result<()> {
     println!("Camera settings: {:?}", camera);
 
     let world = build_book_scene();
-    let mut rng = rand::thread_rng();
+    let rendered = trace_scene(&world, &camera, ny, nx, ns);
 
-    let buffer = ImageBuffer::from_fn(nx, ny, |x, y| {
-        let mut rgb = Vec3::new(0.0, 0.0, 0.0);
-        for _ in 0..ns {
-            let u = (x as f64 + rng.gen::<f64>()) / nx as f64;
-            let v = ((ny - y) as f64 + rng.gen::<f64>()) / ny as f64;
-            let ray = camera.make_ray(u, v);
-            rgb += color(&world, ray, 0);
-        }
-        rgb /= ns as f64;
-        let rgb = Vec3::new(rgb.r().sqrt(), rgb.g().sqrt(), rgb.b().sqrt());
-        let ir: u8 = (255.99 * rgb.r()) as u8;
-        let ig: u8 = (255.99 * rgb.g()) as u8;
-        let ib: u8 = (255.99 * rgb.b()) as u8;
-
-        image::Rgb([ir, ig, ib])
-    });
-
-    buffer.save("image.png")?;
-
-    Ok(())
-}
-
-fn color(world: &World, ray: Ray, depth: u8) -> Vec3 {
-    if let Some(hit) = world.hit(&ray, 0.001, std::f64::MAX) {
-        // return (hit.normal + 1.0) * 0.5;
-        // recurse until you bounce off into the sky
-        if depth < 50 {
-            if let Some(reflection) = hit.material.scatter(&ray, &hit) {
-                // return (*reflection.ray.direction() + 1.0) * 0.5;
-                return color(world, reflection.ray, depth + 1) * reflection.attenuation;
-            } else {
-                return Vec3::new(0.0, 0.0, 0.0);
-            }
-        }
+    if let Some(image) = RgbImage::from_vec(
+        nx,
+        ny,
+        rendered
+            .iter()
+            .flat_map(|v| v.0.iter())
+            .map(|c| (c * 255.99) as u8)
+            .collect(),
+    ) {
+        image.save("mapped-image.png")?;
     }
 
-    let unit_direction = normalize(ray.direction());
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    mix(Vec3::new(1.0, 1.0, 1.0), Vec3::new(0.5, 0.7, 1.0), t)
+    Ok(())
 }
 
 fn build_book_scene() -> World {

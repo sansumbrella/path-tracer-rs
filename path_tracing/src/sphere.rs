@@ -5,7 +5,7 @@ use super::{HitRecord, Hitable, Scattering};
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub material: Box<Scattering>, // for testability, would be easier not to complect with materials
+    pub material: Box<Scattering + Sync>, // for testability, would be easier not to complect with materials
 }
 
 impl Hitable for Sphere {
