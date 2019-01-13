@@ -1,8 +1,11 @@
 extern crate image;
 
-use geometry::{Camera, Dielectric, Hitable, Lambertian, Metallic, Sphere, World};
+mod geometry;
+mod math;
+
+use crate::geometry::{Camera, Dielectric, Hitable, Lambertian, Metallic, Sphere, World};
+use crate::math::{mix, normalize, Ray, Vec3};
 use image::ImageBuffer;
-use math::{mix, normalize, Ray, Vec3};
 use rand::prelude::*;
 
 fn main() -> std::io::Result<()> {

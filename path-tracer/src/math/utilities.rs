@@ -1,5 +1,5 @@
 use super::vector::*;
-use rand::distributions::{Distribution, UnitCircle, UnitSphereSurface};
+use rand::distributions::{Distribution, UnitSphereSurface};
 use rand::prelude::*;
 use std::borrow::Borrow;
 use std::ops::{Add, Mul, Sub};
@@ -22,8 +22,16 @@ pub fn random_in_unit_sphere() -> Vec3 {
 /// returns a random point within a unit disk
 pub fn random_in_unit_disk() -> [f64; 2] {
     let mut rng = rand::thread_rng();
-    let disk = UnitCircle::new();
-    disk.sample(&mut rng)
+    loop {
+        let p = Vec3::new(
+            2.0 * rng.gen::<f64>() - 1.0,
+            2.0 * rng.gen::<f64>() - 1.0,
+            0.0,
+        );
+        if p.length_squared() < 1.0 {
+            return [p.0[0], p.0[1]];
+        }
+    }
 }
 
 pub fn rand() -> f64 {
