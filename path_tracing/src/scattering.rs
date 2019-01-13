@@ -1,7 +1,5 @@
 use super::HitRecord;
-use crate::math::{
-    dot, normalize, rand, random_in_unit_sphere, reflect, refract, schlick, Ray, Vec3,
-};
+use super::{dot, normalize, rand, random_in_unit_sphere, reflect, refract, schlick, Ray, Vec3};
 
 /// A Ray after scattering off a Hitable
 pub struct ScatteredRay {

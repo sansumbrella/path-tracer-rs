@@ -1,11 +1,9 @@
 [package]
-name = "path-tracer"
+name = "path_tracing"
 version = "0.1.0"
 authors = ["David Wicks <wicks.db@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-image = "*"
 rand = "^0.6.1"
 approx = "*"
-path_tracing = { path ="../path_tracing" }

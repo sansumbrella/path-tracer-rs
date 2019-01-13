@@ -1,10 +1,7 @@
 extern crate image;
 
-mod geometry;
-mod math;
-
-use crate::geometry::{Camera, Dielectric, Hitable, Lambertian, Metallic, Sphere, World};
-use crate::math::{mix, normalize, Ray, Vec3};
+use path_tracing::{mix, normalize, Ray, Vec3};
+use path_tracing::{Camera, Dielectric, Hitable, Lambertian, Metallic, Sphere, World};
 use image::ImageBuffer;
 use rand::prelude::*;
 

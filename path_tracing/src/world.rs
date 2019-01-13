@@ -1,5 +1,5 @@
 use super::hitable::*;
-use crate::math::Ray;
+use super::Ray;
 
 pub struct World(Vec<Box<Hitable>>);
 
