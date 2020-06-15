@@ -8,7 +8,7 @@ pub struct HitRecord<'a> {
     pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
-    pub material: &'a Scattering,
+    pub material: &'a dyn Scattering,
 }
 
 impl<'a> HitRecord<'a> {

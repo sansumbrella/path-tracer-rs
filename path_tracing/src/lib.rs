@@ -81,14 +81,3 @@ pub fn trace_scene(
 
     colors
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn mapping_a_collection() {
-        let columns = 4;
-        let rows = 2;
-    }
-}
